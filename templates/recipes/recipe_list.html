@@ -1,0 +1,97 @@
+{% extends 'base.html' %}
+
+{% block title %}Recipes{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-3">
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="mb-0">Categories</h5>
+            </div>
+            <div class="list-group list-group-flush">
+                <a href="{% url 'recipe_list' %}" class="list-group-item list-group-item-action {% if not category %}active{% endif %}">
+                    All Recipes
+                </a>
+                {% for cat in categories %}
+                    <a href="{% url 'category_detail' cat.slug %}" 
+                       class="list-group-item list-group-item-action {% if category.slug == cat.slug %}active{% endif %}">
+                        {{ cat.name }}
+                    </a>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-9">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2 class="mb-0">{% if category %}{{ category.name }}{% else %}All Recipes{% endif %}</h2>
+            <a href="{% url 'recipe_create' %}" class="btn btn-primary">
+                <i class="fas fa-plus"></i> Add Recipe
+            </a>
+        </div>
+
+        <div class="row row-cols-1 row-cols-md-3 g-4">
+            {% for recipe in recipes %}
+                <div class="col">
+                    <div class="card h-100">
+                        {% if recipe.image %}
+                            <img src="{{ recipe.image.url }}" class="card-img-top" alt="{{ recipe.title }}">
+                        {% else %}
+                            <div class="card-img-top bg-light text-center py-5">
+                                <i class="fas fa-utensils fa-3x text-secondary"></i>
+                            </div>
+                        {% endif %}
+                        <div class="card-body">
+                            <h5 class="card-title">{{ recipe.title }}</h5>
+                            <p class="card-text text-muted">
+                                <small>
+                                    <i class="fas fa-clock"></i> Prep: {{ recipe.preparation_time }}min
+                                    <br>
+                                    <i class="fas fa-fire"></i> Cook: {{ recipe.cooking_time }}min
+                                </small>
+                            </p>
+                            <p class="card-text">{{ recipe.description|truncatewords:20 }}</p>
+                        </div>
+                        <div class="card-footer bg-transparent">
+                            <a href="{% url 'recipe_detail' recipe.slug %}" class="btn btn-outline-primary btn-sm">
+                                View Recipe
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            {% empty %}
+                <div class="col-12">
+                    <div class="alert alert-info">
+                        No recipes found. Why not <a href="{% url 'recipe_create' %}">add one</a>?
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+
+        {% if is_paginated %}
+            <nav class="mt-4">
+                <ul class="pagination justify-content-center">
+                    {% if page_obj.has_previous %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ page_obj.previous_page_number }}">Previous</a>
+                        </li>
+                    {% endif %}
+
+                    {% for num in page_obj.paginator.page_range %}
+                        <li class="page-item {% if page_obj.number == num %}active{% endif %}">
+                            <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+                        </li>
+                    {% endfor %}
+
+                    {% if page_obj.has_next %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ page_obj.next_page_number }}">Next</a>
+                        </li>
+                    {% endif %}
+                </ul>
+            </nav>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

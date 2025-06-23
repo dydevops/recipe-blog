@@ -1,0 +1,129 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block extra_css %}
+<style>
+    /* Full-width Slider Styles */
+    .hero-slider {
+        position: relative;
+        width: 100%;
+        height: 80vh;
+        overflow: hidden;
+    }
+
+    .hero-slider .carousel-item {
+        height: 80vh;
+        background-size: cover;
+        background-position: center;
+        position: relative;
+    }
+
+    .hero-slider .carousel-caption {
+        background-color: rgba(0, 0, 0, 0.5);
+        padding: 20px;
+        border-radius: 10px;
+        text-align: center;
+    }
+
+    .hero-slider .carousel-caption h1 {
+        color: #FFF5E6;
+        font-size: 3rem;
+        margin-bottom: 20px;
+    }
+
+    .hero-slider .carousel-caption p {
+        color: #F0E5D8;
+        font-size: 1.2rem;
+    }
+
+    .hero-slider .carousel-control-prev,
+    .hero-slider .carousel-control-next {
+        width: 5%;
+    }
+
+    /* Responsive adjustments */
+    @media (max-width: 768px) {
+        .hero-slider {
+            height: 50vh;
+        }
+
+        .hero-slider .carousel-item {
+            height: 50vh;
+        }
+
+        .hero-slider .carousel-caption h1 {
+            font-size: 2rem;
+        }
+
+        .hero-slider .carousel-caption p {
+            font-size: 1rem;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-8 offset-md-2 text-center">
+            <h1 class="display-4 mb-4">Welcome to DK Recipe Blog</h1>
+            <p class="lead mb-5">Discover delicious recipes, cooking tips, and culinary inspiration</p>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-4 mb-4">
+            <div class="card h-100 shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title">Latest Recipes</h5>
+                    <p class="card-text">Explore our newest and most exciting recipes from various cuisines.</p>
+                    <a href="{% url 'recipe_list' %}" class="btn btn-primary">View Recipes</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="card h-100 shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title">Cooking Videos</h5>
+                    <p class="card-text">Watch step-by-step cooking tutorials and recipe demonstrations.</p>
+                    <a href="{% url 'video_list' %}" class="btn btn-primary">Watch Videos</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="card h-100 shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title">Culinary Glossary</h5>
+                    <p class="card-text">Learn cooking terms, techniques, and expand your culinary knowledge.</p>
+                    <a href="{% url 'glossary_list' %}" class="btn btn-primary">Explore Glossary</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mt-4">
+        <div class="col-12 text-center">
+            <h2 class="mb-4">Featured Categories</h2>
+            <div class="d-flex justify-content-center flex-wrap">
+                {% for category in categories %}
+                <a href="{{ category.get_absolute_url }}" class="btn btn-outline-secondary m-2">
+                    {{ category.name }}
+                </a>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Optional: Auto-advance slider
+    document.addEventListener('DOMContentLoaded', function() {
+        var heroSlider = new bootstrap.Carousel(document.getElementById('heroSlider'), {
+            interval: 5000, // Change slide every 5 seconds
+            ride: 'carousel'
+        });
+    });
+</script>
+{% endblock %}

@@ -1,0 +1,123 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container mt-4 col-lg-8 offset-lg-2">
+    <h2 class="mb-4">
+        Search Results 
+        {% if query %}for "{{ query }}"{% endif %}
+        {% if category %}in {{ category|title }} Category{% endif %}
+    </h2>
+    
+    {% if not query %}
+        <div class="alert alert-info">
+            Enter a search term to find recipes, videos, and categories.
+        </div>
+    {% else %}
+        <div class="row">
+            {% if category == 'glossary' %}
+                {% if glossary_terms %}
+                    <div class="col-12 mb-4">
+                        <h3>Glossary Terms ({{ glossary_terms.paginator.count }})</h3>
+                        {% for term in glossary_terms %}
+                            <div class="card mb-3">
+                                <div class="card-body">
+                                    <h5 class="card-title">{{ term.name }}</h5>
+                                    <p class="card-text">{{ term.description|truncatewords:30 }}</p>
+                                    <a href="{{ term.get_absolute_url }}" class="btn btn-primary">View Term</a>
+                                </div>
+                            </div>
+                        {% endfor %}
+                        
+                        {% include 'includes/pagination.html' with page=glossary_terms query=query category=category %}
+                    </div>
+                {% else %}
+                    <div class="col-12">
+                        <div class="alert alert-warning">
+                            No glossary terms found for "{{ query }}". Try different search terms.
+                        </div>
+                    </div>
+                {% endif %}
+            {% elif recipes or videos or recipe_categories or glossary_terms %}
+                {% if recipes %}
+                    <div class="col-md-12 mb-4">
+                        <h3>Recipes ({{ recipes.paginator.count }})</h3>
+                        {% for recipe in recipes %}
+                            <div class="card mb-3">
+                                {% if recipe.image %}
+                                    <img src="{{ recipe.image.url }}" class="card-img-top" alt="{{ recipe.title }}">
+                                {% endif %}
+                                <div class="card-body">
+                                    <h5 class="card-title">{{ recipe.title }}</h5>
+                                    <p class="card-text">{{ recipe.description|truncatewords:20 }}</p>
+                                    <a href="{{ recipe.get_absolute_url }}" class="btn btn-primary">View Recipe</a>
+                                </div>
+                            </div>
+                        {% endfor %}
+                        
+                        {% include 'includes/pagination.html' with page=recipes query=query category=category %}
+                    </div>
+                {% endif %}
+                
+                {% if videos %}
+                    <div class="col-md-12 mb-4">
+                        <h3>Videos ({{ videos.paginator.count }})</h3>
+                        {% for video in videos %}
+                            <div class="card mb-3">
+                                {% if video.thumbnail %}
+                                    <img src="{{ video.thumbnail.url }}" class="card-img-top" alt="{{ video.video_name }}">
+                                {% endif %}
+                                <div class="card-body">
+                                    <h5 class="card-title">{{ video.video_name }}</h5>
+                                    <a href="{{ video.get_url }}" class="btn btn-primary">View Video</a>
+                                </div>
+                            </div>
+                        {% endfor %}
+                        
+                        {% include 'includes/pagination.html' with page=videos query=query category=category %}
+                    </div>
+                {% endif %}
+                
+                {% if recipe_categories %}
+                    <div class="col-md-12 mb-4">
+                        <h3>Recipe Categories ({{ recipe_categories.paginator.count }})</h3>
+                        {% for category in recipe_categories %}
+                            <div class="card mb-3">
+                                <div class="card-body">
+                                    <h5 class="card-title">{{ category.name }}</h5>
+                                    <a href="{{ category.get_absolute_url }}" class="btn btn-primary">View Category</a>
+                                </div>
+                            </div>
+                        {% endfor %}
+                        
+                        {% include 'includes/pagination.html' with page=recipe_categories query=query category=category %}
+                    </div>
+                {% endif %}
+                
+                {% if glossary_terms %}
+                    <div class="col-md-12 mb-4">
+                        <h3>Glossary Terms ({{ glossary_terms.paginator.count }})</h3>
+                        {% for term in glossary_terms %}
+                            <div class="card mb-3">
+                                <div class="card-body">
+                                    <h5 class="card-title">{{ term.name }}</h5>
+                                    <p class="card-text">{{ term.description|truncatewords:30 }}</p>
+                                    <a href="{{ term.get_absolute_url }}" class="btn btn-primary">View Term</a>
+                                </div>
+                            </div>
+                        {% endfor %}
+                        
+                        {% include 'includes/pagination.html' with page=glossary_terms query=query category=category %}
+                    </div>
+                {% endif %}
+            {% else %}
+                <div class="col-12">
+                    <div class="alert alert-warning">
+                        No results found for "{{ query }}". Try different search terms.
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

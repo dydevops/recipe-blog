@@ -1,0 +1,795 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load recipe_extras %}
+{% load crispy_forms_tags %}
+
+{% block title %}{{ recipe.title }}{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card">
+                {% if recipe.image %}
+                    <img src="{{ recipe.image.url }}" class="card-img-top" alt="{{ recipe.title }}">
+                {% endif %}
+                <div class="card-body">
+                    <h1 class="card-title">{{ recipe.title }}</h1>
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <div>
+                            {% for category in recipe.categories.all %}
+                                <span class="badge bg-primary me-1">{{ category.name }}</span>
+                            {% endfor %}
+                            <span class="badge bg-secondary">{{ recipe.get_difficulty_display }}</span>
+                        </div>
+                        {% comment %} <div>
+                            <a href="{% url 'recipe_update' recipe.slug %}" class="btn btn-outline-primary btn-sm">
+                                <i class="fas fa-edit"></i> Edit
+                            </a>
+                            <a href="{% url 'recipe_delete' recipe.slug %}" class="btn btn-outline-danger btn-sm">
+                                <i class="fas fa-trash"></i> Delete
+                            </a>
+                        </div> {% endcomment %}
+                    </div>
+
+                    <div class="row mb-4">
+                        <div class="col-sm-4">
+                            <div class="text-center">
+                                <i class="fas fa-clock fa-2x mb-2"></i>
+                                <p class="mb-0"><strong>Prep Time</strong></p>
+                                <p>{{ recipe.preparation_time }} min</p>
+                            </div>
+                        </div>
+                        <div class="col-sm-4">
+                            <div class="text-center">
+                                <i class="fas fa-fire fa-2x mb-2"></i>
+                                <p class="mb-0"><strong>Cook Time</strong></p>
+                                <p>{{ recipe.cooking_time }} min</p>
+                            </div>
+                        </div>
+                        <div class="col-sm-4">
+                            <div class="text-center">
+                                <i class="fas fa-users fa-2x mb-2"></i>
+                                <p class="mb-0"><strong>Servings</strong></p>
+                                <p>{{ recipe.servings }}</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="text-center mb-3">
+                        <a href="{% url 'recipe_calories_detail' recipe.slug %}" class="btn btn-info">
+                        <i class="fas fa-info-circle"></i> View Calories
+                        </a>
+                    </div>
+                    {% comment %} <div class="text-center mb-3 d-flex justify-content-center">
+                        <div class="mr-3 d-flex align-items-center">
+                            <button class="btn btn-primary">
+                                <i class="fas fa-thumbs-up"></i> Like
+                            </button>
+                            <span class="ml-2">{{ recipe.like_count }}2</span>
+                        </div>
+                        <div class="d-flex align-items-center">
+                            <button class="btn btn-danger">
+                                <i class="fas fa-thumbs-down"></i> Dislike
+                            </button>
+                            <span class="ml-2">{{ recipe.dislike_count }}2</span>
+                        </div>
+                    </div> {% endcomment %}
+
+                    <h4>Description</h4>
+                    <p>{{ recipe.description }}</p>
+
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="card mb-4">
+                                <div class="card-header">
+                                    <h4 class="mb-0">
+                                        <i class="fas fa-list me-2"></i>Ingredients
+                                    </h4>
+                                </div>
+                                <div class="card-body p-0">
+                                    {{ recipe.get_ingredients_with_sections|safe }}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <h4>Instructions</h4>
+                    <div class="mb-4">
+                        {% for instruction in recipe.instructions.splitlines %}
+                            {% if instruction|length > 0 %}
+                                <div class="mb-3">
+                                    <div class="d-flex">
+                                        <span class="badge bg-secondary me-2">{{ forloop.counter }}</span>
+                                        <p class="mb-0">{{ instruction }}</p>
+                                    </div>
+                                </div>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+            {% if total_nutrition %}
+        <div class="col-md-12 mt-4">
+            <div class="card">
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-5">
+                                <h4>Detailed Nutrition Breakdown</h4>
+                            <b>Macronutrients</b>
+                            <ul class="list-group">
+                                <li class="list-group-item d-flex justify-content-between align-items-center">
+                                    Calories
+                                    <span class="badge bg-primary rounded-pill">{{ total_nutrition|get_item:'calories'|floatformat:2 }} kcal</span>
+                                </li>
+                                <li class="list-group-item d-flex justify-content-between align-items-center">
+                                    Protein
+                                    <span class="badge bg-success rounded-pill">{{ total_nutrition|get_item:'protein'|floatformat:2 }} g</span>
+                                </li>
+                                <li class="list-group-item d-flex justify-content-between align-items-center">
+                                    Carbohydrates
+                                    <span class="badge bg-warning rounded-pill">{{ total_nutrition|get_item:'carbohydrates'|floatformat:2 }} g</span>
+                                </li>
+                                <li class="list-group-item d-flex justify-content-between align-items-center">
+                                    Fat
+                                    <span class="badge bg-danger rounded-pill">{{ total_nutrition|get_item:'fat'|floatformat:2 }} g</span>
+                                </li>
+                                <li class="list-group-item d-flex justify-content-between align-items-center">
+                                    Fiber
+                                    <span class="badge bg-info rounded-pill">{{ total_nutrition|get_item:'fiber'|floatformat:2 }} g</span>
+                                </li>
+                                <li class="list-group-item d-flex justify-content-between align-items-center">
+                                    Salt
+                                    <span class="badge bg-secondary rounded-pill">{{ total_nutrition|get_item:'salt'|floatformat:2 }} g</span>
+                                </li>
+                            </ul>
+                            <div class="text-muted small mt-3 text-center">
+                                * Based on a 2,000 calorie diet. Individual needs may vary.
+                            </div>
+                        </div>
+                        
+                    </div>
+
+                </div>
+            </div>
+        </div>
+        {% endif %}
+        <div class="reviews-section mt-5">
+            <h3>Reviews</h3>
+            
+            {% if user.is_authenticated %}
+            <div class="review-form-container">
+                <h4 class="mb-3">Share Your Experience</h4>
+                <form method="post" action="{% url 'create_review' recipe.slug %}">
+                    {% csrf_token %}
+                    <div class="form-group mb-3">
+                        <label class="form-label text-left w-100">Your Rating</label>
+                        <div class="rating">
+                            {% for i in "54321" %}
+                                <input type="radio" 
+                                       id="star{{ i }}" 
+                                       name="rating" 
+                                       value="{{ i }}" 
+                                       class="rating-input" 
+                                       {% if forloop.first %}checked{% endif %}>
+                                <label for="star{{ i }}" class="rating-label" title="{{ i }} stars"></label>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    <div class="form-group mb-3">
+                        <label class="form-label">Your Review</label>
+                        <textarea 
+                            name="review_text" 
+                            class="form-control" 
+                            rows="4" 
+                            placeholder="Write your review here..."
+                            required
+                        ></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Submit Review</button>
+                </form>
+            </div>
+            {% else %}
+            <div class="review-form-container">
+                <h4 class="mb-3">Share Your Experience</h4>
+                <form method="post" action="{% url 'create_review' recipe.slug %}">
+                    {% csrf_token %}
+                    <div class="form-group mb-3">
+                        <label class="form-label">Name</label>
+                        <input 
+                            type="text" 
+                            name="name" 
+                            class="form-control" 
+                            placeholder="Your Name" 
+                            required
+                        >
+                    </div>
+                    <div class="form-group mb-3">
+                        <label class="form-label">Email</label>
+                        <input 
+                            type="email" 
+                            name="email" 
+                            class="form-control" 
+                            placeholder="Your Email" 
+                            required
+                        >
+                    </div>
+                    <div class="form-group mb-3">
+                        <label class="form-label text-left w-100">Your Rating</label>
+                        <div class="rating">
+                            {% for i in "54321" %}
+                                <input type="radio" 
+                                       id="star{{ i }}" 
+                                       name="rating" 
+                                       value="{{ i }}" 
+                                       class="rating-input" 
+                                       {% if forloop.first %}checked{% endif %}>
+                                <label for="star{{ i }}" class="rating-label" title="{{ i }} stars"></label>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    <div class="form-group mb-3">
+                        <label class="form-label">Your Review</label>
+                        <textarea 
+                            name="review_text" 
+                            class="form-control" 
+                            rows="4" 
+                            placeholder="Write your review here..."
+                            required
+                        ></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Submit Review</button>
+                </form>
+            </div>
+            {% endif %}
+
+            {% if review_count > 0 %}
+            <div class="overall-rating">
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="text-center">
+                            <p>Overall Rating & Reviews</p>
+                            <p class="overall-rating-number">
+                                {{average_rating|floatformat:1}}<small>/5</small>
+                            </p>
+                            <ul class="star-rating">
+                                {% for i in "12345" %}
+                                <li>
+                                    <i class="fa fa-star{% if average_rating < forloop.counter|add:-0.5 %}-o{% elif average_rating >= forloop.counter|add:-0.5 and average_rating < forloop.counter %}-half-o {% endif %}" aria-hidden="true"></i>
+                                </li>
+                                {% endfor %}
+                            </ul>
+                            <p class="mt-3">
+                                Based on {{review_count}} review{{ review_count|pluralize }}
+                            </p>
+                        </div>
+                    </div>
+                    <div class="col-md-8">
+                        <ul class="rating-breakdown">
+                            {% for star in star_values %}
+                            <li>
+                                <span class="star-label">
+                                    <i class="fa fa-star"></i> {{ star }}
+                                </span>
+                                <div class="progress">
+                                    <div 
+                                        class="progress-bar" 
+                                        role="progressbar" 
+                                        style="width: {{ star_percentages|get_item:star|floatformat:0 }}%"
+                                        aria-valuenow="{{ star_percentages|get_item:star|floatformat:0 }}"
+                                        aria-valuemin="0"
+                                        aria-valuemax="100"
+                                    ></div>
+                                </div>
+                                <span class="percentage">
+                                    {{ star_percentages|get_item:star|floatformat:0 }}%
+                                </span>
+                            </li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            {% else %}
+            <div class="alert alert-info text-center mt-4">
+                <p>No reviews yet. Be the first to review this recipe!</p>
+                {% if user.is_authenticated %}
+                <a href="#review-form" class="btn btn-primary mt-2">Write a Review</a>
+                {% endif %}
+            </div>
+            {% endif %}
+
+            <div class="reviews-list">
+                {% for review in reviews %}
+                <div class="review-card">
+                    {% if user.is_authenticated %}
+                    <button 
+                        class="btn btn-reply reply-toggle-btn" 
+                        data-form-id="replyForm{{ review.id }}">
+                        Reply
+                    </button>
+                    {% endif %}
+
+                    <div class="review-header">
+                        <div class="review-user-info d-flex align-items-center">
+                            <div class="user-avatar mr-3">
+                                <i class="fas fa-user-circle"></i>
+                            </div>
+                            <div>
+                                <strong>
+                                    {% if review.user %}
+                                        {{ review.user.get_full_name|default:review.user.username }}
+                                    {% else %}
+                                        {{ review.name|default:"Anonymous" }}
+                                    {% endif %}
+                                </strong>
+                                <span class="text-muted ml-2">{{ review.created_at|date:"F d, Y" }}</span>
+                            </div>
+                        </div>
+                        <div class="review-rating">
+                            {% for i in "12345" %}
+                                <span class="star {% if forloop.counter <= review.rating %}filled{% endif %}">★</span>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    
+                    <p class="review-text">{{ review.review_text }}</p>
+
+                    <!-- Replies for this review -->
+                    <div class="replies">
+                        {% if user.is_authenticated %}
+                        <div 
+                            id="replyForm{{ review.id }}" 
+                            class="reply-form"
+                            style="display: none;"
+                        >
+                            <form method="post" action="{% url 'create_reply' review_id=review.id %}" class="mt-3">
+                                {% csrf_token %}
+                                <div class="form-group">
+                                    <textarea 
+                                        name="reply_text" 
+                                        class="form-control" 
+                                        placeholder="Write your reply..."
+                                        rows="3"
+                                        required
+                                    ></textarea>
+                                </div>
+                                <button type="submit" class="btn btn-primary btn-sm mt-2">
+                                    Post Reply
+                                </button>
+                            </form>
+                        </div>
+                        {% endif %}
+
+                        {% if review.replies.exists %}
+                        <div class="reply-section-header">
+                            <h5>
+                                Replies 
+                                <span class="reply-count">{{ review.replies.count }}</span>
+                            </h5>
+                        </div>
+                            {% for reply in review.replies.all %}
+                            <div class="reply-card">
+                                <div class="reply-header">
+                                    <div class="reply-user-info">
+                                        <div class="reply-user-avatar">
+                                            {{ reply.user.username|slice:":2" }}
+                                        </div>
+                                        <div>
+                                            <div class="reply-username">
+                                                {{ reply.user.get_full_name|default:reply.user.username }}
+                                            </div>
+                                            <div class="reply-date">
+                                                {{ reply.created_at|timesince }} ago
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <p class="reply-text">{{ reply.reply_text }}</p>
+                            </div>
+                            {% endfor %}
+                        {% endif %}
+                    </div>
+                </div>
+                {% empty %}
+                <p>No reviews yet. Be the first to review!</p>
+                {% endfor %}
+            </div>
+        </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">Tips</h5>
+                </div>
+                <div class="card-body">
+                    <ul class="list-unstyled mb-0">
+                        <li class="mb-2">
+                            <i class="fas fa-info-circle text-info me-2"></i>
+                            Read through the entire recipe before starting.
+                        </li>
+                        <li class="mb-2">
+                            <i class="fas fa-temperature-high text-warning me-2"></i>
+                            Preheat your oven if required.
+                        </li>
+                        <li>
+                            <i class="fas fa-balance-scale text-success me-2"></i>
+                            Measure ingredients accurately.
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+
+            {% if recipe.related_terms.exists %}
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5 class="mb-0">Glossary</h5>
+                    </div>
+                    <div class="card-body">
+                        {% for term in recipe.related_terms.all %}
+                            <h6>{{ term.name }}</h6>
+                            <p class="mb-3">{{ term.description|truncatewords:30 }}</p>
+                        {% endfor %}
+                    </div>
+                </div>
+            {% endif %}
+
+
+            {% if recipe.get_related_recipes.exists %}
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">Related Recipes</h5>
+                </div>
+                <div class="card-body">
+                    <ul>
+                        {% for related_recipe in recipe.get_related_recipes %}
+                            <li>
+                                <a href="{{ related_recipe.get_absolute_url }}">{{ related_recipe.recipe_name }}</a>
+                            </li>
+                        {% empty %}
+                            <li>No related recipes found.</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+
+        
+
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+{{ block.super }}
+<style>
+    /* Advanced Rating Design */
+    .rating {
+        display: flex;
+        flex-direction: row-reverse;
+        justify-content: left;
+        align-items: center;
+        gap: 0.25rem;
+        margin-bottom: 1rem;
+    }
+
+    .rating-input {
+        display: none;
+    }
+
+    .rating-label {
+        position: relative;
+        display: inline-block;
+        width: 2rem;
+        height: 2rem;
+        cursor: pointer;
+        background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%23e4e4e4" stroke="%23cccccc" stroke-width="1.5"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>');
+        background-size: cover;
+        transition: all 0.2s ease;
+    }
+
+    .rating-label:hover,
+    .rating-label:hover ~ .rating-label,
+    .rating-input:checked ~ .rating-label {
+        background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%23ffc107" stroke="%23ffa000" stroke-width="1.5"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>');
+    }
+
+    .rating-label:hover {
+        transform: scale(1.15);
+    }
+
+    .rating-input:checked + .rating-label {
+        transform: scale(1.1);
+        filter: drop-shadow(0 0 5px rgba(255,193,7,0.5));
+    }
+
+    /* Review Rating Display */
+    .review-rating .star {
+        font-size: 1.5rem;
+        color: #e4e4e4;
+        text-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        transition: color 0.2s ease;
+    }
+
+    .review-rating .star.filled {
+        color: #ffc107;
+        text-shadow: 0 2px 6px rgba(255,193,7,0.3);
+    }
+
+    /* Responsive Adjustments */
+    @media (max-width: 576px) {
+        .rating-label {
+            width: 1.75rem;
+            height: 1.75rem;
+        }
+    }
+
+    /* Reviews Section */
+    .reviews-section {
+        background-color: #f8f9fa;
+        border-radius: 8px;
+        padding: 1.5rem;
+        margin-top: 2rem;
+    }
+
+    /* Review Card */
+    .review-card {
+        position: relative;
+        background-color: white;
+        border: 1px solid #e9ecef;
+        border-radius: 8px;
+        padding: 1.25rem;
+        margin-bottom: 1.5rem;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    }
+
+    /* Review Header */
+    .review-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1rem;
+        padding-bottom: 0.75rem;
+        border-bottom: 1px solid #e9ecef;
+        position: relative;
+        padding-right: 50px; /* Make space for reply button */
+    }
+
+    /* Reply Button Styling */
+    .btn-reply {
+        position: absolute;
+        top: 1rem;
+        right: 1rem;
+        background-color: #6c757d;
+        color: white;
+        border: none;
+        padding: 0.25rem 0.5rem;
+        font-size: 0.8rem;
+        border-radius: 4px;
+        z-index: 10;
+        transition: background-color 0.3s ease;
+    }
+
+    .btn-reply:hover {
+        background-color: #5a6268;
+    }
+
+    /* Reply Form Styling */
+    .reply-form {
+        width: 100%;
+        display: none;
+        background-color: #f8f9fa;
+        border: 1px solid #e9ecef;
+        border-radius: 6px;
+        padding: 1rem;
+        margin-top: 1rem;
+        transition: all 0.3s ease;
+    }
+
+    .reply-form textarea {
+        width: 100%;
+        min-height: 100px;
+        resize: vertical;
+    }
+
+    /* Reply Section */
+    .replies-container {
+        background-color: #f4f5f7;
+        border-radius: 8px;
+        padding: 1rem;
+        margin-top: 1rem;
+        border: 1px solid #e9ecef;
+    }
+
+    .reply-section-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1rem;
+        padding-bottom: 0.5rem;
+        border-bottom: 1px solid #dee2e6;
+    }
+
+    .reply-section-header h5 {
+        margin-bottom: 0;
+        color: #495057;
+        font-weight: 600;
+    }
+
+    .reply-count {
+        background-color: #6c757d;
+        color: white;
+        border-radius: 50%;
+        padding: 0.2rem 0.5rem;
+        font-size: 0.75rem;
+        margin-left: 0.5rem;
+    }
+
+    .reply-card {
+        background-color: white;
+        border: 1px solid #e9ecef;
+        border-radius: 6px;
+        padding: 1rem;
+        margin-bottom: 0.75rem;
+        position: relative;
+        transition: all 0.3s ease;
+    }
+
+    .reply-card:hover {
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+        transform: translateY(-3px);
+    }
+
+    .reply-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 0.75rem;
+    }
+
+    .reply-user-info {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+
+    .reply-user-avatar {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background-color: #6c757d;
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+        text-transform: uppercase;
+        font-size: 0.9rem;
+    }
+
+    .reply-username {
+        font-weight: 600;
+        color: #343a40;
+        font-size: 0.9rem;
+    }
+
+    .reply-date {
+        color: #6c757d;
+        font-size: 0.8rem;
+    }
+
+    .reply-text {
+        color: #212529;
+        line-height: 1.6;
+        margin-bottom: 0;
+    }
+
+    /* Review Footer Styling */
+    .review-footer {
+        display: flex;
+        align-items: center;
+        justify-content: flex-start;
+        margin-top: 1rem;
+        padding-top: 0.5rem;
+        border-top: 1px solid #e9ecef;
+    }
+
+    /* Average Rating Styling */
+    .overall-rating {
+        background-color: #f8f9fa;
+        border-radius: 8px;
+        padding: 1.5rem;
+        margin-bottom: 1.5rem;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    }
+
+    .overall-rating-number {
+        font-size: 3rem;
+        color: #28a745;
+        display: flex;
+        align-items: flex-end;
+        justify-content: center;
+    }
+
+    .overall-rating-number small {
+        font-size: 1.5rem;
+        color: #6c757d;
+        margin-left: 0.5rem;
+    }
+
+    .star-rating {
+        display: flex;
+        justify-content: center;
+        list-style: none;
+        padding: 0;
+        margin: 1rem 0;
+    }
+
+    .star-rating li {
+        margin: 0 0.25rem;
+    }
+
+    .star-rating .fa-star {
+        color: #ffc107;
+        font-size: 1.5rem;
+    }
+
+    .star-rating .fa-star-o {
+        color: #e4e4e4;
+        font-size: 1.5rem;
+    }
+
+    .star-rating .fa-star-half-o {
+        color: #ffc107;
+        font-size: 1.5rem;
+    }
+
+    .rating-breakdown {
+        margin-top: 1rem;
+    }
+
+    .rating-breakdown li {
+        display: flex;
+        align-items: center;
+        margin-bottom: 0.5rem;
+    }
+
+    .rating-breakdown .progress {
+        flex-grow: 1;
+        margin: 0 1rem;
+        height: 10px;
+    }
+
+    .rating-breakdown .progress-bar {
+        background-color: #28a745;
+    }
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    function toggleReplyForm(formId) {
+        const replyForm = document.getElementById(formId);
+        if (replyForm) {
+            replyForm.style.display = replyForm.style.display === 'none' ? 'block' : 'none';
+        } else {
+            console.error('Reply form not found:', formId);
+        }
+    }
+
+    // Add event listeners to reply buttons to prevent default form submission
+    document.addEventListener('DOMContentLoaded', function() {
+        const replyButtons = document.querySelectorAll('.reply-toggle-btn');
+        replyButtons.forEach(button => {
+            button.addEventListener('click', function(event) {
+                event.preventDefault();
+                const formId = this.getAttribute('data-form-id');
+                toggleReplyForm(formId);
+            });
+        });
+    });
+</script>
+{% endblock %}

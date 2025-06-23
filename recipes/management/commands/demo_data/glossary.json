@@ -1,0 +1,32 @@
+[
+    {
+        "name": "Egg", 
+        "singular_name": "egg",
+        "plural_name": "eggs",
+        "description": "A versatile protein-rich food from chickens, used in baking, cooking, and as a standalone dish. Rich in nutrients like protein, vitamins A, D, E, and B12."
+    },
+    {
+        "name": "Milk", 
+        "singular_name": "milk",
+        "plural_name": "milks",
+        "description": "A nutritious liquid produced by mammals. Comes in various types like cow, goat, and plant-based alternatives. Essential for cooking, baking, and drinking."
+    },
+    {
+        "name": "Flour", 
+        "singular_name": "flour",
+        "plural_name": "flours",
+        "description": "A powder made by grinding grains, seeds, or roots. Different types include wheat, rice, almond, and corn flour, each with unique properties for cooking and baking."
+    },
+    {
+        "name": "Sugar", 
+        "singular_name": "sugar",
+        "plural_name": "sugars",
+        "description": "A sweet crystalline substance used for sweetening. Varieties include white, brown, raw, and alternative sweeteners like stevia and honey."
+    },
+    {
+        "name": "Butter", 
+        "singular_name": "butter",
+        "plural_name": "butters",
+        "description": "A dairy product made from churning cream. Used in cooking, baking, and as a spread. Comes in salted and unsalted varieties."
+    }
+]
